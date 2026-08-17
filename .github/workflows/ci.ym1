@@ -18,7 +18,12 @@ jobs:
           echo "Building DevOps Web App"
           echo "Build successful"
 
-      - name: Run tests
+            - name: Send Slack notification
+        if: always()
         run: |
-          echo "Running tests"
-          echo "Tests completed successfully"
+          curl -X POST \
+            -H "Content-type: application/json" \
+            --data '{"text":"CI Pipeline completed successfully for DevOps Web App."}' \
+            "$SLACK_WEBHOOK_URL"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

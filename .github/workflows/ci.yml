@@ -22,3 +22,13 @@ jobs:
         run: |
           echo "Running tests"
           echo "Tests completed successfully"
+
+      - name: Send Slack notification
+        if: always()
+        run: |
+          curl -X POST \
+            -H "Content-type: application/json" \
+            --data '{"text":"CI Pipeline completed for DevOps Web App."}' \
+            "$SLACK_WEBHOOK_URL"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

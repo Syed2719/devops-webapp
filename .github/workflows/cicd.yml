@@ -11,13 +11,30 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Create Kubernetes cluster
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+          kind create cluster --wait 60s
 
       - name: Build Docker image
-        run: docker build -t devops-lab-app ./app
+        run: docker build -t devops-lab-app:latest ./app
+
+      - name: Load Docker image into Kubernetes
+        run: kind load docker-image devops-lab-app:latest
 
       - name: Apply Kubernetes Deployment
         run: kubectl apply -f k8s/deployment.yml
 
       - name: Apply Kubernetes Service
         run: kubectl apply -f k8s/service.yml
+
+      - name: Verify deployment
+        run: |
+          kubectl get pods
+          kubectl get deployment
+          kubectl get service
+  
